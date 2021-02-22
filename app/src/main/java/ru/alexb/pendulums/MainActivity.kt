@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -60,6 +61,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onToggleAnimationClick(v: View) {
+        if (v is Button) {
+            v.text = when (v.text) {
+                getText(R.string.play) -> getText(R.string.pause)
+                else -> getText(R.string.play)
+            }
+        }
         canvasView.toggleAnimation()
     }
 

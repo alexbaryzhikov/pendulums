@@ -2,12 +2,12 @@ package ru.alexb.pendulums
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
+import androidx.core.content.ContextCompat
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -21,16 +21,35 @@ class CanvasView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
+    private val colors: List<Paint> = listOf(
+        R.color.color_01,
+        R.color.color_02,
+        R.color.color_03,
+        R.color.color_04,
+        R.color.color_05,
+        R.color.color_06,
+        R.color.color_07,
+        R.color.color_08,
+        R.color.color_09,
+        R.color.color_10,
+        R.color.color_11,
+        R.color.color_12,
+        R.color.color_13,
+        R.color.color_14,
+        R.color.color_15,
+        R.color.color_16
+    ).map { colorId ->
+        Paint().apply {
+            isAntiAlias = true
+            color = ContextCompat.getColor(context, colorId)
+        }
+    }
     private val textPaint = Paint().apply {
         isAntiAlias = true
         textSize = 40f
         val colorValue = TypedValue()
         context.theme.resolveAttribute(R.attr.textColorCanvas, colorValue, true)
         color = colorValue.data
-    }
-    private val purple = Paint().apply {
-        isAntiAlias = true
-        color = Color.parseColor("purple")
     }
     private var frameTicks: Disposable? = null
     private val frames: ArrayList<Long> = ArrayList()
@@ -42,7 +61,7 @@ class CanvasView @JvmOverloads constructor(
     private var verticalOffsets: List<Double> = emptyList()
     private var horizontalOffset: Double = 0.0
     private var r: Double = 0.0
-    private var showFps = true
+    private var showFps = false
     private var isAnimating = false
 
     override fun onAttachedToWindow() {
@@ -79,7 +98,7 @@ class CanvasView @JvmOverloads constructor(
         for (i in 0..periodMultipliers.lastIndex) {
             val x = (width - horizontalOffset * 2) * getPosition(periodMultipliers[i]) + horizontalOffset
             val y = verticalOffsets[i]
-            canvas.drawCircle(x.toFloat(), y.toFloat(), r.toFloat(), purple)
+            canvas.drawCircle(x.toFloat(), y.toFloat(), r.toFloat(), colors[i % colors.size])
         }
 
         if (showFps) {
