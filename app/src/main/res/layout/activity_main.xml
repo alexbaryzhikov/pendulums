@@ -37,6 +37,7 @@
             android:imeOptions="actionDone"
             android:importantForAutofill="no"
             android:inputType="number"
+            android:selectAllOnFocus="true"
             android:text="@string/default_number" />
 
         <Button

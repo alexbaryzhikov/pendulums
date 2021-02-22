@@ -139,6 +139,10 @@ class CanvasView @JvmOverloads constructor(
         isAnimating = !isAnimating
     }
 
+    fun isPlaying(): Boolean {
+        return isAnimating
+    }
+
     fun toggleFps() {
         showFps = !showFps
     }
