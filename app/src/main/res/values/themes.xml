@@ -12,6 +12,7 @@
         <!-- System bar color. -->
         <item name="android:statusBarColor">?android:colorBackground</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:navigationBarColor">@color/black</item>
         <!-- Text color. -->
         <item name="textColorCanvas">@color/black</item>
     </style>
