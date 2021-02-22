@@ -14,13 +14,32 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
     private lateinit var canvasView: CanvasView
     private lateinit var toggleAnimationButton: Button
+    private lateinit var numberEditText: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         canvasView = findViewById(R.id.canvas_view)
         toggleAnimationButton = findViewById(R.id.toggle_animation_button)
-        findViewById<EditText>(R.id.number_edit_text).setOnEditorActionListener(::onEditorAction)
+        numberEditText = findViewById(R.id.number_edit_text)
+        numberEditText.setOnEditorActionListener(::onEditorAction)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(IS_PLAYING_KEY, canvasView.isPlaying())
+        outState.putLong(TIME_KEY, canvasView.getTime())
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        onNumberEntered(numberEditText.text)
+        canvasView.setTime(savedInstanceState.getLong(TIME_KEY, 0))
+        val isPlaying = savedInstanceState.getBoolean(IS_PLAYING_KEY, true)
+        if (canvasView.isPlaying() != isPlaying) {
+            canvasView.toggleAnimation()
+        }
+        updateToggleAnimationButton()
     }
 
     private fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?) = when (actionId) {
@@ -41,19 +60,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onNumberEntered(s: CharSequence?) {
-        val default = 12
         val n = when {
-            s == null || s.isBlank() -> default
+            s == null || s.isBlank() -> CanvasView.DEFAULT_NUMBER
             else -> {
                 val input = try {
                     Integer.parseInt(s.toString())
                 } catch (e: Throwable) {
-                    default
+                    CanvasView.DEFAULT_NUMBER
                 }
                 if (input > 1) {
                     input.coerceAtMost(1000)
                 } else {
-                    default
+                    CanvasView.DEFAULT_NUMBER
                 }
             }
         }
@@ -80,5 +98,10 @@ class MainActivity : AppCompatActivity() {
 
     fun onToggleFpsClick(v: View) {
         canvasView.toggleFps()
+    }
+
+    companion object {
+        private const val TIME_KEY = "time"
+        private const val IS_PLAYING_KEY = "is_playing"
     }
 }

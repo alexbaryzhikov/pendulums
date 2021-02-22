@@ -56,7 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="onToggleAnimationClick"
-            android:text="@string/play" />
+            android:text="@string/pause" />
 
         <Button
             android:id="@+id/toggle_fps_button"

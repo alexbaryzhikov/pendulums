@@ -62,7 +62,7 @@ class CanvasView @JvmOverloads constructor(
     private var horizontalOffset: Double = 0.0
     private var r: Double = 0.0
     private var showFps = false
-    private var isAnimating = false
+    private var isAnimating = true
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -82,12 +82,12 @@ class CanvasView @JvmOverloads constructor(
     }
 
     private fun initScene() {
-        resetAnimation()
         periodMultipliers = linSpace(1.0, 1.5, n)
         r = height / (periodMultipliers.size.toDouble() + 1.0) / 2.0 - 5.0
         val step = height / (periodMultipliers.size.toDouble() + 1.0)
         verticalOffsets = List(periodMultipliers.size) { (it + 1.0) * step }
         horizontalOffset = r + 10.0
+        t0 = now()
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -123,6 +123,19 @@ class CanvasView @JvmOverloads constructor(
         fps = frames.size * 1000 / (t - frames[0] + 1)
     }
 
+    fun isPlaying(): Boolean {
+        return isAnimating
+    }
+
+    fun getTime(): Long {
+        return time
+    }
+
+    fun setTime(time: Long) {
+        Log.d(TAG, "time=$time")
+        this.time = time
+    }
+
     fun setNumber(n: Int) {
         Log.d(TAG, "n=$n")
         this.n = n
@@ -130,17 +143,13 @@ class CanvasView @JvmOverloads constructor(
     }
 
     fun resetAnimation() {
-        isAnimating = false
         t0 = now()
         time = 0
+        isAnimating = true
     }
 
     fun toggleAnimation() {
         isAnimating = !isAnimating
-    }
-
-    fun isPlaying(): Boolean {
-        return isAnimating
     }
 
     fun toggleFps() {
@@ -148,6 +157,7 @@ class CanvasView @JvmOverloads constructor(
     }
 
     companion object {
+        const val DEFAULT_NUMBER = 12
         private const val TAG = "CustomView"
 
         fun now(): Long = System.currentTimeMillis()
