@@ -37,6 +37,12 @@ class CanvasView @JvmOverloads constructor(
     private var fps: Long = 0
     private var t0: Long = 0
     private var time: Long = 0
+    private var n = 12
+    private var periodMultipliers: List<Double> = emptyList()
+    private var verticalOffsets: List<Double> = emptyList()
+    private var horizontalOffset: Double = 0.0
+    private var r: Double = 0.0
+    private var showFps = true
     private var isAnimating = false
 
     override fun onAttachedToWindow() {
@@ -44,7 +50,6 @@ class CanvasView @JvmOverloads constructor(
         frameTicks = Observable.interval(10, TimeUnit.MILLISECONDS, Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy { invalidate() }
-        t0 = now()
     }
 
     override fun onDetachedFromWindow() {
@@ -54,6 +59,16 @@ class CanvasView @JvmOverloads constructor(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         Log.d(TAG, "w=$w, h=$h")
+        initScene()
+    }
+
+    private fun initScene() {
+        resetAnimation()
+        periodMultipliers = linSpace(1.0, 1.5, n)
+        r = height / (periodMultipliers.size.toDouble() + 1.0) / 2.0 - 5.0
+        val step = height / (periodMultipliers.size.toDouble() + 1.0)
+        verticalOffsets = List(periodMultipliers.size) { (it + 1.0) * step }
+        horizontalOffset = r + 10.0
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -61,11 +76,18 @@ class CanvasView @JvmOverloads constructor(
         updateTime()
         updateFps()
 
-        val x = 0.5 - cos(time / 1000.0) / 2.0
-        canvas.drawCircle(((width - 200) * x + 100).toFloat(), height / 2.0f, 51f, purple)
+        for (i in 0..periodMultipliers.lastIndex) {
+            val x = (width - horizontalOffset * 2) * getPosition(periodMultipliers[i]) + horizontalOffset
+            val y = verticalOffsets[i]
+            canvas.drawCircle(x.toFloat(), y.toFloat(), r.toFloat(), purple)
+        }
 
-        canvas.drawText(fps.toString(), 60f, 100f, textPaint)
+        if (showFps) {
+            canvas.drawText(fps.toString(), 5f, 40f, textPaint)
+        }
     }
+
+    private fun getPosition(offset: Double) = 0.5 - cos(time * offset / 1000.0) / 2.0
 
     private fun updateTime() {
         val t1 = now()
@@ -82,17 +104,35 @@ class CanvasView @JvmOverloads constructor(
         fps = frames.size * 1000 / (t - frames[0] + 1)
     }
 
-    fun startAnimate() {
-        isAnimating = true
+    fun setNumber(n: Int) {
+        Log.d(TAG, "n=$n")
+        this.n = n
+        initScene()
     }
 
-    fun stopAnimate() {
+    fun resetAnimation() {
         isAnimating = false
+        t0 = now()
+        time = 0
+    }
+
+    fun toggleAnimation() {
+        isAnimating = !isAnimating
+    }
+
+    fun toggleFps() {
+        showFps = !showFps
     }
 
     companion object {
         private const val TAG = "CustomView"
 
-        private fun now(): Long = System.currentTimeMillis()
+        fun now(): Long = System.currentTimeMillis()
+
+        fun linSpace(start: Double, end: Double, num: Int): List<Double> {
+            val delta = end - start
+            val step = delta / (num - 1)
+            return List(num) { start + it * step }
+        }
     }
 }
