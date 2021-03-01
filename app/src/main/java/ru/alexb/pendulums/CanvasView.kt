@@ -61,7 +61,7 @@ class CanvasView @JvmOverloads constructor(
     private var verticalOffsets: List<Double> = emptyList()
     private var horizontalOffset: Double = 0.0
     private var r: Double = 0.0
-    private var showFps = false
+    private var showFps = BuildConfig.DEBUG
     private var isAnimating = true
 
     override fun onAttachedToWindow() {
@@ -150,10 +150,6 @@ class CanvasView @JvmOverloads constructor(
 
     fun toggleAnimation() {
         isAnimating = !isAnimating
-    }
-
-    fun toggleFps() {
-        showFps = !showFps
     }
 
     companion object {

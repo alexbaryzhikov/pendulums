@@ -40,32 +40,25 @@
             android:selectAllOnFocus="true"
             android:text="@string/default_number" />
 
-        <Button
+        <ImageButton
             android:id="@+id/reset_animation_button"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:contentDescription="@string/reset"
             android:onClick="onResetAnimationClick"
-            android:text="@string/reset" />
+            android:src="@drawable/ic_reset" />
 
-        <Button
+        <ImageButton
             android:id="@+id/toggle_animation_button"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:contentDescription="@string/pause"
             android:onClick="onToggleAnimationClick"
-            android:text="@string/pause" />
-
-        <Button
-            android:id="@+id/toggle_fps_button"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onToggleFpsClick"
-            android:text="@string/fps" />
+            android:src="@drawable/ic_pause" />
 
     </LinearLayout>
 

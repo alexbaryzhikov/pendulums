@@ -5,15 +5,15 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 @Suppress("UNUSED_PARAMETER")
 class MainActivity : AppCompatActivity() {
     private lateinit var canvasView: CanvasView
-    private lateinit var toggleAnimationButton: Button
+    private lateinit var toggleAnimationButton: ImageButton
     private lateinit var numberEditText: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,10 +80,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateToggleAnimationButton() {
-        toggleAnimationButton.text = when (canvasView.isPlaying()) {
-            true -> getText(R.string.pause)
-            else -> getText(R.string.play)
-        }
+        toggleAnimationButton.setImageResource(
+            when (canvasView.isPlaying()) {
+                true -> R.drawable.ic_pause
+                else -> R.drawable.ic_play
+            }
+        )
     }
 
     fun onResetAnimationClick(v: View) {
@@ -94,10 +96,6 @@ class MainActivity : AppCompatActivity() {
     fun onToggleAnimationClick(v: View) {
         canvasView.toggleAnimation()
         updateToggleAnimationButton()
-    }
-
-    fun onToggleFpsClick(v: View) {
-        canvasView.toggleFps()
     }
 
     companion object {
