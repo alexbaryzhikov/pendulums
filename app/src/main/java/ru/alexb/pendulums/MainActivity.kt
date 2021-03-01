@@ -1,6 +1,7 @@
 package ru.alexb.pendulums
 
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -14,15 +15,21 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
     private lateinit var canvasView: CanvasView
     private lateinit var toggleAnimationButton: ImageButton
-    private lateinit var numberEditText: EditText
+    private lateinit var countText: EditText
+    private lateinit var waveLengthText: EditText
+    private lateinit var timeScaleText: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         canvasView = findViewById(R.id.canvas_view)
         toggleAnimationButton = findViewById(R.id.toggle_animation_button)
-        numberEditText = findViewById(R.id.number_edit_text)
-        numberEditText.setOnEditorActionListener(::onEditorAction)
+        countText = findViewById(R.id.count_text)
+        countText.setOnEditorActionListener(::onEditorAction)
+        waveLengthText = findViewById(R.id.wave_length_text)
+        waveLengthText.setOnEditorActionListener(::onEditorAction)
+        timeScaleText = findViewById(R.id.time_scale_text)
+        timeScaleText.setOnEditorActionListener(::onEditorAction)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -33,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        onNumberEntered(numberEditText.text)
+        onNumberEntered(countText.text)
         canvasView.setTime(savedInstanceState.getLong(TIME_KEY, 0))
         val isPlaying = savedInstanceState.getBoolean(IS_PLAYING_KEY, true)
         if (canvasView.isPlaying() != isPlaying) {
@@ -46,7 +53,11 @@ class MainActivity : AppCompatActivity() {
         EditorInfo.IME_ACTION_DONE -> {
             v.clearFocus()
             hideIme(v)
-            onNumberEntered(v.text)
+            when (v) {
+                countText -> onNumberEntered(v.text)
+                waveLengthText -> Log.d("MainActivity", "wave length entered")
+                timeScaleText -> Log.d("MainActivity", "time scale entered")
+            }
             true
         }
         else -> {

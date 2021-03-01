@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">Pendulums</string>
 
-    <string name="default_number">12</string>
+    <string name="count_default">12</string>
+    <string name="wave_length_default">1.5</string>
+    <string name="time_scale_default">1.0</string>
     <string name="reset">Reset</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>

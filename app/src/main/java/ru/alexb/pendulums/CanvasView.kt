@@ -57,7 +57,7 @@ class CanvasView @JvmOverloads constructor(
     private var t0: Long = 0
     private var time: Long = 0
     private var n = 12
-    private var periodMultipliers: List<Double> = emptyList()
+    private var waveLengths: List<Double> = emptyList()
     private var verticalOffsets: List<Double> = emptyList()
     private var horizontalOffset: Double = 0.0
     private var r: Double = 0.0
@@ -82,10 +82,10 @@ class CanvasView @JvmOverloads constructor(
     }
 
     private fun initScene() {
-        periodMultipliers = linSpace(1.0, 1.5, n)
-        r = height / (periodMultipliers.size.toDouble() + 1.0) / 2.0 - 5.0
-        val step = height / (periodMultipliers.size.toDouble() + 1.0)
-        verticalOffsets = List(periodMultipliers.size) { (it + 1.0) * step }
+        waveLengths = linSpace(1.0, 1.5, n)
+        r = height / (waveLengths.size.toDouble() + 1.0) / 2.0 - 5.0
+        val step = height / (waveLengths.size.toDouble() + 1.0)
+        verticalOffsets = List(waveLengths.size) { (it + 1.0) * step }
         horizontalOffset = r + 10.0
         t0 = now()
     }
@@ -95,8 +95,8 @@ class CanvasView @JvmOverloads constructor(
         updateTime()
         updateFps()
 
-        for (i in 0..periodMultipliers.lastIndex) {
-            val x = (width - horizontalOffset * 2) * getPosition(periodMultipliers[i]) + horizontalOffset
+        for (i in 0..waveLengths.lastIndex) {
+            val x = (width - horizontalOffset * 2) * getPosition(waveLengths[i]) + horizontalOffset
             val y = verticalOffsets[i]
             canvas.drawCircle(x.toFloat(), y.toFloat(), r.toFloat(), colors[i % colors.size])
         }
