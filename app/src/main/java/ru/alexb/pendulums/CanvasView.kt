@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -56,11 +55,13 @@ class CanvasView @JvmOverloads constructor(
     private var fps: Long = 0
     private var t0: Long = 0
     private var time: Long = 0
-    private var n = 12
+    private var count = DEFAULT_COUNT
+    private var maxWaveLength = DEFAULT_WAVE_LENGTH
+    private var timeScale = DEFAULT_TIME_SCALE
     private var waveLengths: List<Double> = emptyList()
     private var verticalOffsets: List<Double> = emptyList()
     private var horizontalOffset: Double = 0.0
-    private var r: Double = 0.0
+    private var radius: Double = 0.0
     private var showFps = BuildConfig.DEBUG
     private var isAnimating = true
 
@@ -69,6 +70,7 @@ class CanvasView @JvmOverloads constructor(
         frameTicks = Observable.interval(10, TimeUnit.MILLISECONDS, Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy { invalidate() }
+        t0 = now()
     }
 
     override fun onDetachedFromWindow() {
@@ -77,17 +79,15 @@ class CanvasView @JvmOverloads constructor(
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        Log.d(TAG, "w=$w, h=$h")
-        initScene()
+        updateMeasurements()
     }
 
-    private fun initScene() {
-        waveLengths = linSpace(1.0, 1.5, n)
-        r = height / (waveLengths.size.toDouble() + 1.0) / 2.0 - 5.0
+    private fun updateMeasurements() {
+        waveLengths = linSpace(1.0, maxWaveLength, count)
+        radius = height / (waveLengths.size.toDouble() + 1.0) / 2.0 - 5.0
         val step = height / (waveLengths.size.toDouble() + 1.0)
         verticalOffsets = List(waveLengths.size) { (it + 1.0) * step }
-        horizontalOffset = r + 10.0
-        t0 = now()
+        horizontalOffset = radius + 10.0
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -98,7 +98,7 @@ class CanvasView @JvmOverloads constructor(
         for (i in 0..waveLengths.lastIndex) {
             val x = (width - horizontalOffset * 2) * getPosition(waveLengths[i]) + horizontalOffset
             val y = verticalOffsets[i]
-            canvas.drawCircle(x.toFloat(), y.toFloat(), r.toFloat(), colors[i % colors.size])
+            canvas.drawCircle(x.toFloat(), y.toFloat(), radius.toFloat(), colors[i % colors.size])
         }
 
         if (showFps) {
@@ -106,12 +106,10 @@ class CanvasView @JvmOverloads constructor(
         }
     }
 
-    private fun getPosition(offset: Double) = 0.5 - cos(time * offset / 1000.0) / 2.0
-
     private fun updateTime() {
         val t1 = now()
         if (isAnimating) {
-            time += t1 - t0
+            time += ((t1 - t0) * timeScale).toLong()
         }
         t0 = t1
     }
@@ -123,6 +121,8 @@ class CanvasView @JvmOverloads constructor(
         fps = frames.size * 1000 / (t - frames[0] + 1)
     }
 
+    private fun getPosition(offset: Double) = 0.5 - cos(time * offset / 1000.0) / 2.0
+
     fun isPlaying(): Boolean {
         return isAnimating
     }
@@ -132,14 +132,22 @@ class CanvasView @JvmOverloads constructor(
     }
 
     fun setTime(time: Long) {
-        Log.d(TAG, "time=$time")
         this.time = time
     }
 
-    fun setNumber(n: Int) {
-        Log.d(TAG, "n=$n")
-        this.n = n
-        initScene()
+    fun setCount(count: Int) {
+        this.count = count
+        updateMeasurements()
+    }
+
+    fun setMaxWaveLength(maxWaveLength: Double) {
+        this.maxWaveLength = maxWaveLength
+        waveLengths = linSpace(1.0, maxWaveLength, count)
+        updateMeasurements()
+    }
+
+    fun setTimeScale(timeScale: Double) {
+        this.timeScale = timeScale
     }
 
     fun resetAnimation() {
@@ -153,8 +161,9 @@ class CanvasView @JvmOverloads constructor(
     }
 
     companion object {
-        const val DEFAULT_NUMBER = 12
-        private const val TAG = "CustomView"
+        const val DEFAULT_COUNT = 12
+        const val DEFAULT_WAVE_LENGTH = 1.5
+        const val DEFAULT_TIME_SCALE = 1.0
 
         fun now(): Long = System.currentTimeMillis()
 

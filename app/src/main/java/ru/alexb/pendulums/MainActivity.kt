@@ -1,7 +1,6 @@
 package ru.alexb.pendulums
 
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -40,7 +39,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        onNumberEntered(countText.text)
+        onCountEntered(countText.text)
+        onWaveLengthEntered(waveLengthText.text)
+        onTimeScaleEntered(timeScaleText.text)
         canvasView.setTime(savedInstanceState.getLong(TIME_KEY, 0))
         val isPlaying = savedInstanceState.getBoolean(IS_PLAYING_KEY, true)
         if (canvasView.isPlaying() != isPlaying) {
@@ -54,9 +55,9 @@ class MainActivity : AppCompatActivity() {
             v.clearFocus()
             hideIme(v)
             when (v) {
-                countText -> onNumberEntered(v.text)
-                waveLengthText -> Log.d("MainActivity", "wave length entered")
-                timeScaleText -> Log.d("MainActivity", "time scale entered")
+                countText -> onCountEntered(v.text)
+                waveLengthText -> onWaveLengthEntered(v.text)
+                timeScaleText -> onTimeScaleEntered(v.text)
             }
             true
         }
@@ -70,24 +71,50 @@ class MainActivity : AppCompatActivity() {
         imm.hideSoftInputFromWindow(v.windowToken, 0)
     }
 
-    private fun onNumberEntered(s: CharSequence?) {
-        val n = when {
-            s == null || s.isBlank() -> CanvasView.DEFAULT_NUMBER
+    private fun onCountEntered(s: CharSequence?) {
+        val count = when {
+            s == null || s.isBlank() -> CanvasView.DEFAULT_COUNT
             else -> {
                 val input = try {
-                    Integer.parseInt(s.toString())
+                    s.toString().toInt()
                 } catch (e: Throwable) {
-                    CanvasView.DEFAULT_NUMBER
+                    CanvasView.DEFAULT_COUNT
                 }
-                if (input > 1) {
-                    input.coerceAtMost(1000)
-                } else {
-                    CanvasView.DEFAULT_NUMBER
-                }
+                input.coerceAtLeast(1).coerceAtMost(1000)
             }
         }
-        canvasView.setNumber(n)
+        canvasView.setCount(count)
         updateToggleAnimationButton()
+    }
+
+    private fun onWaveLengthEntered(s: CharSequence?) {
+        val waveLength = when {
+            s == null || s.isBlank() -> CanvasView.DEFAULT_WAVE_LENGTH
+            else -> {
+                val input = try {
+                    s.toString().toDouble()
+                } catch (e: Throwable) {
+                    CanvasView.DEFAULT_WAVE_LENGTH
+                }
+                input.coerceAtLeast(1.0).coerceAtMost(1000.0)
+            }
+        }
+        canvasView.setMaxWaveLength(waveLength)
+    }
+
+    private fun onTimeScaleEntered(s: CharSequence?) {
+        val timeScale = when {
+            s == null || s.isBlank() -> CanvasView.DEFAULT_TIME_SCALE
+            else -> {
+                val input = try {
+                    s.toString().toDouble()
+                } catch (e: Throwable) {
+                    CanvasView.DEFAULT_TIME_SCALE
+                }
+                input.coerceAtLeast(0.001).coerceAtMost(1000000.0)
+            }
+        }
+        canvasView.setTimeScale(timeScale)
     }
 
     private fun updateToggleAnimationButton() {
