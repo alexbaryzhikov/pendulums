@@ -1,0 +1,5 @@
+Pendulums
+
+A simulation of an array of pendulums with configurable parameters
+
+Each pendulum has slightly longer period than it's previous neighbor. Play with the number of pendulums, period delta, and time scale, and observe the emerging motion patterns.
